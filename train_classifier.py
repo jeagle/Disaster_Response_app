@@ -29,10 +29,10 @@ def load_data(database_filepath):
     
     # Define feature(X) and target(Y) variables 
     X = df['message'].values
-    Y = df.iloc[:, 5:].values
+    Y = df.iloc[:, 4:].values
     
     # Define category names
-    category_names = df.iloc[:,4:].columns
+    category_names = df.iloc[:, 4:].columns
     
     return X, Y, category_names
 
@@ -87,7 +87,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
         report.append(classification_report(Y_test[i], y_pred[i], target_names=[column]))
         i+=1
 
-    return report
+    print(report)
 
 def save_model(model, model_filepath):
     """ Saving model  as a pickle file

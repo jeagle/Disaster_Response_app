@@ -10,7 +10,13 @@ def load_data(messages_filepath, categories_filepath):
     # Load in messages and categories datasets 
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    
+        
+    return messages, categories
+
+def clean_data(messages, categories):
+    """ Input: Uncleaned dataframe(df) 
+        Output: Cleaned dataframe(df)
+    """
     # Merge datasets joining on 'id'
     df = messages.merge(categories, on='id', how='outer')
     
@@ -29,12 +35,6 @@ def load_data(messages_filepath, categories_filepath):
     df = df.drop(['categories'], axis=1) # Drop original column
     df = pd.concat([df, categories], axis=1, join='inner') # Concatenate the original df with the new categories df
     
-    return df
-
-def clean_data(df):
-    """ Input: Uncleaned dataframe(df) 
-        Output: Cleaned dataframe(df)
-    """   
     # Remove duplicates
     df.drop_duplicates(['id'], inplace=True)
     

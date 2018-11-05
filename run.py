@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar, Histogram, Heatmap
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
@@ -43,8 +43,13 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
-#     word_category_count = df.groupby(df.[:]).value_counts()
-#     word_category_name = list(word_category_count.index)
+    # Extracting top 10 most common words in disaster messages
+    word_category_count = df.iloc[:,4:].sum().sort_values(ascending=False).head(10)
+    word_category_name = list(df.iloc[:,4:].columns)
+    
+    # Extracting all categories for heatmap
+    category = df.iloc[:,4:].corr().values
+    category_names = list(df.iloc[:,4:].columns)
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -67,25 +72,45 @@ def index():
                     'title': "Genre"
                 }
             }
-            
-#               'data2': [
-#                   Bar(
+        },
+           
+        {    
+            'data': [
+                  Bar(
                                         
-#                       x=word_category_name,
-#                       y=word_category_count
-#                 )
-#             ],
+                      x=word_category_name,
+                      y=word_category_count
+                )
+            ],
 
-#                 'layout2': {
-#                     'title': 'Distribution of most common word category',
-#                     'yaxis': {
-#                         'title': "Count"
-#                     },
-#                     'xaxis': {
-#                         'title': "Word category"
-#                     }
-#                 }
-            }
+               'layout': {
+                   'title': 'Distribution of most common word category',
+                   'yaxis': {
+                       'title': "Count"
+                   },
+                   'xaxis': {
+                       'title': "Word category"
+                    }
+                }
+        },
+        
+        {    
+               'data': [
+                  Heatmap(
+                                        
+                      x=category_names,
+                      y=category_names[::-1],
+                      z=category
+                )
+            ],
+
+               'layout': {
+                   'title': 'Heatmap of message words',
+                   'width': 700,
+                   'height': 700
+
+                    }                
+        }
     ]
     
     # encode plotly graphs in JSON
